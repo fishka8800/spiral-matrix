@@ -52,5 +52,33 @@ class TestMatrixParser(unittest.TestCase):
         )
 
 
+    def test_invalid_value(self):
+        text = """
+        | 10 | abc |
+        | 30 | 40  |
+        """
+
+        with self.assertRaises(MatrixFormatError):
+            parse_matrix(text)
+
+    def test_empty_cell(self):
+        text = """
+        | 10 | 20 |
+        | 30 |    |
+        """
+
+        with self.assertRaises(MatrixFormatError):
+            parse_matrix(text)
+
+    def test_negative_value(self):
+        text = """
+        | 10 | -20 |
+        | 30 | 40  |
+        """
+
+        with self.assertRaises(MatrixFormatError):
+            parse_matrix(text)
+
+
 if __name__ == "__main__":
     unittest.main()

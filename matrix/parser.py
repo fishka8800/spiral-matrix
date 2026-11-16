@@ -4,26 +4,44 @@ from matrix.exceptions import MatrixFormatError
 def parse_matrix(text: str) -> list[list[int]]:
     """Преобразует текст в квадратную матрицу"""
     matrix = []
-    for line in text.splitlines():
-        if "|" not in line:
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        if not line.strip() or "|" not in line:
             continue
+
+        items = line.split("|")
+
+        if items[0].strip() == "":
+            items = items[1:]
+        if items and items[-1].strip() == "":
+            items = items[:-1]
+
+        if not items:
+            raise MatrixFormatError(f"Строка {line_number}: строка матрицы не содержит значений")
+
         numbers = []
 
-        for item in line.split("|"):
+        for column_number, item in enumerate(items, start=1):
             item = item.strip()
-            if item.isdigit():
-                numbers.append(int(item))
-        if numbers:
-            matrix.append(numbers)
+            if not item:
+                raise MatrixFormatError(f"Строка {line_number}, столбец {column_number}: пустое значение")
+            if not item.isdecimal():
+                raise MatrixFormatError(
+                    "Строка {line_number}, столбец {column_number}: "
+                    f"некорректное значение '{item}'"
+                )
+
+            numbers.append(int(item))
+
+        matrix.append(numbers)
 
     if not matrix:
         raise MatrixFormatError("Матрица пустая")
+
     size = len(matrix)
+
     for row in matrix:
         if len(row) != size:
-            raise MatrixFormatError(
-                "Матрица должна быть квадратной"
-            )
+            raise MatrixFormatError("Матрица должна быть квадратной")
 
     return matrix
 
